@@ -135,7 +135,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length) {
     char cmd[BufferSize] = {'\0'};
     strcat(cmd, "gcc ");
     for(size_t i = 0; i < dep_length; i++) {
-        if(!Build.str_ends_with(dep[i], ".c")){ //ignore anything that isnt a .c
+        if(Build.str_ends_with(dep[i], ".h") || Build.str_ends_with(dep[i], ".hpp")){ //ignore anything that isnt a .c
             continue;
         }
         strcat(cmd, dep[i]);

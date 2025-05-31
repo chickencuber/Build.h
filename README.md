@@ -1,6 +1,6 @@
 # Build.h
 ## What is Build.h
-build.h is a header only library that acts as a simple build system
+build.h is a header only library that acts as a simple build system inspired by [nob.h](https://www.github.com/tsoding/nob.h)
 ## Why make a header only C build system 
 because I can
 ## How to use Build.h
