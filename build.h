@@ -24,10 +24,11 @@ typedef const char* string;
 #define BufferSize 1024
 
 EXTERN struct {
-    void (*build)(string file, string dep[], size_t dep_length);
+    void (*build)(string file, string dep[], size_t dep_length, string flag[], size_t flag_length);
     bool (*str_ends_with)(string str, string suffix);
 } Build;
 
+#define BUILD_IMPLEMENTATION
 // implementation
 #ifdef BUILD_IMPLEMENTATION
 
@@ -98,42 +99,30 @@ void __Build_Bootstrap__() {
         "build.h",
     };
     if(__Build_needs_rebuild__("./build", deps, 2)) {
-        Build.build("build.new", deps, 2); 
+        Build.build("build.new", deps, 2, (string[]) {}, 0); 
         __Build_Switch_New__();
     } else {
         printf("not rebuilding build\n");
     }
 }
 
-#ifdef __clang__
-void __Build_Build__(string file, string dep[], size_t dep_length) {
+#ifdef __GNUC__
+void __Build_Build__(string file, string dep[], size_t dep_length, string flags[], size_t flag_length) {
     if(!__Build_needs_rebuild__(file, dep, dep_length)) {
         printf("not rebuilding %s\n", file);
         return;
     }
     char cmd[BufferSize] = {'\0'};
+#ifdef __clang__
     strcat(cmd, "clang ");
-    for(size_t i = 0; i < dep_length; i++) {
-        if(!Build.str_ends_with(dep[i], ".c")){ //ignore anything that isnt a .c
-            continue;
-        }
-        strcat(cmd, dep[i]);
+#else
+    strcat(cmd, "gcc ");
+#endif
+    for(size_t i = 0; i < flag_length; i++) {
+        strcat(cmd, "-");
+        strcat(cmd, flags[i]);
         strcat(cmd, " ");
     }
-    strcat(cmd, "-o ");
-    strcat(cmd, file);
-    printf("running cmd %s\n", cmd);
-    system(cmd);
-    printf("done\n");
-}
-#elif defined(__GNUC__)
-void __Build_Build__(string file, string dep[], size_t dep_length) {
-    if(!__Build_needs_rebuild__(file, dep, dep_length)) {
-        printf("not rebuilding %s\n", file);
-        return;
-    }
-    char cmd[BufferSize] = {'\0'};
-    strcat(cmd, "gcc ");
     for(size_t i = 0; i < dep_length; i++) {
         if(Build.str_ends_with(dep[i], ".h") || Build.str_ends_with(dep[i], ".hpp")){ //ignore anything that isnt a .c
             continue;
@@ -148,7 +137,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length) {
     printf("done\n");
 }
 #else 
-void __Build_Build__(string file, string dep[], long dep_length) {
+void __Build_Build__(string file, string dep[], size_t dep_length, string flags[], size_t flag_length) {
     fprintf(stderr, "\033[31munknown compiler\033[0m\n");
     exit(1);
 }

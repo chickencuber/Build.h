@@ -20,6 +20,7 @@ int main() {
 * cross platform build system with windows*(untested, and no MSVC yet), linux, and mac*(untested) support
 * simple api
 * gcc and clang compiler support
+* simple flag support
 ## Planed 
 - [ ] MSVC support
 - [ ] including files from a remote source
