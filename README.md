@@ -24,6 +24,6 @@ int main() {
 ## Planed 
 - [ ] MSVC support
 - [ ] including files from a remote source
-- [ ] cross platform fs api
+- [x] cross platform fs api
 - [ ] more compilers than just gcc and clang
 
