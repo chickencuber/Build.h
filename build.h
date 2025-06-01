@@ -26,19 +26,26 @@ typedef const char* string;
 EXTERN struct {
     void (*build)(string file, string dep[], size_t dep_length, string flag[], size_t flag_length);
     bool (*str_ends_with)(string str, string suffix);
+    struct {
+        bool (*exists)(string path);
+        bool (*is_file)(string path);
+        bool (*is_dir)(string path);
+        void (*copy)(string from, string to);
+        void (*move)(string from, string to);
+        void (*mkdir)(string path);
+        void (*remove)(string path);
+    } fs;
 } Build;
 
-#define BUILD_IMPLEMENTATION
 // implementation
 #ifdef BUILD_IMPLEMENTATION
 
 #ifdef _WIN32
 void __Build_Switch_New__() {
-    // We need to run a command to rename the file, then launch the new executable
     system("start \"\" /B cmd /C \"timeout /t 1 >nul && move /Y build.new build.exe && build.exe\"");
-    exit(0); // Exit the current process
+    exit(0);
 }
-bool __Build_needs_rebuild__(const char* output, const char* sources[], size_t n) {
+bool __Build_needs_rebuild__(string output, string sources[], size_t n) {
     HANDLE outFile = CreateFileA(output, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     if (outFile == INVALID_HANDLE_VALUE) return true;
 
@@ -59,7 +66,68 @@ bool __Build_needs_rebuild__(const char* output, const char* sources[], size_t n
 
     return false;
 }
+bool __BUILD__FS_exists(string file) {
+    DWORD attr = GetFileAttributesA(file);
+    return (attr != INVALID_FILE_ATTRIBUTES);
+}
+
+bool __BUILD__FS_is_file(string path) {
+    DWORD attr = GetFileAttributesA(path);
+    return (attr != INVALID_FILE_ATTRIBUTES) && !(attr & FILE_ATTRIBUTE_DIRECTORY);
+}
+
+bool __BUILD__FS_is_dir(string path) {
+    DWORD attr = GetFileAttributesA(path);
+    return (attr != INVALID_FILE_ATTRIBUTES) && (attr & FILE_ATTRIBUTE_DIRECTORY);
+}
+
+void __BUILD__FS_copy(string from, string to) {
+    CopyFileA(from, to, FALSE);
+}
+
+void __BUILD__FS_fs_move(string from, string to) {
+    MoveFileExA(from, to, MOVEFILE_REPLACE_EXISTING);
+}
+
+void __BUILD__FS_mkdir(string path) {
+    CreateDirectoryA(path, NULL);
+}
+
+void __BUILD__FS_remove(string path) {
+    if (__BUILD__FS_is_dir(path)) {
+        RemoveDirectoryA(path);
+    } else {
+        DeleteFileA(path);
+    }
+}
 #else
+bool __BUILD__FS_exists(string file) {
+    struct stat st;
+    return stat(file, &st) == 0;
+}
+bool __BUILD__FS_is_file(string path) {
+    struct stat st;
+    return stat(path, &st) == 0 && S_ISREG(st.st_mode);
+}
+bool __BUILD__FS_is_dir(string path) {
+    struct stat st;
+    return stat(path, &st) == 0 && S_ISDIR(st.st_mode);
+}
+void __BUILD__FS_copy(string from, string to) {
+    char cmd[BufferSize];
+    snprintf(cmd, sizeof(cmd), "cp \"%s\" \"%s\"", from, to);
+    system(cmd);
+}
+void __BUILD__FS_fs_move(string from, string to) {
+    rename(from, to);
+}
+void __BUILD__FS_mkdir(string path) {
+    mkdir(path, 0755);
+}
+void __BUILD__FS_remove(string path) {
+    unlink(path);
+}
+
 void __Build_Switch_New__() {
     sleep(1);
     rename("./build.new", "./build");
@@ -68,7 +136,7 @@ void __Build_Switch_New__() {
     perror("execvp failed");
     exit(1);
 }
-bool __Build_needs_rebuild__(const char* output, const char* sources[], size_t n) {
+bool __Build_needs_rebuild__(string output, string sources[], size_t n) {
     struct stat out_stat;
     if (stat(output, &out_stat) != 0) return true;
     for (size_t i = 0; i < n; i++) {
@@ -80,7 +148,7 @@ bool __Build_needs_rebuild__(const char* output, const char* sources[], size_t n
 }
 #endif
 
-bool __Build_Ends_With__(const char *str, const char *suffix) {
+bool __Build_Ends_With__(string str, string suffix) {
     if (!str || !suffix)
         return false;
 
@@ -148,6 +216,13 @@ int __Build_Main__(int argc, char **argv);
     main(int argc, char **argv) { \
         Build.build =  __Build_Build__; \
         Build.str_ends_with = __Build_Ends_With__; \
+        Build.fs.mkdir = __BUILD__FS_mkdir; \
+        Build.fs.exists = __BUILD__FS_exists; \
+        Build.fs.is_dir = __BUILD__FS_is_dir; \
+        Build.fs.is_file = __BUILD__FS_is_file; \
+        Build.fs.copy = __BUILD__FS_copy; \
+        Build.fs.move = __BUILD__FS_fs_move; \
+        Build.fs.remove = __BUILD__FS_remove; \
         __Build_Bootstrap__(); \
         return __Build_Main__(argc, argv); \
     }; \
