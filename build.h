@@ -260,6 +260,10 @@ FlagStringList flag_to_strings(Flag flag) {
             result.data[1] = flag.str_value; // e.g., "c99", "gnu11"
             result.count = 2;
             break;
+        case __FLAG_RAW:
+            result.count = 1;
+            result.data[0] = flag.str_value;
+            break;
         default:
             // ignore unknown flags silently
             break;
@@ -350,6 +354,10 @@ FlagStringList flag_to_strings_msvc(Flag flag) {
                 // default or ignore for unsupported standards
                 result.count = 0;
             }
+            break;
+        case __FLAG_RAW:
+            result.count = 1;
+            result.data[0] = flag.str_value;
             break;
         default:
             // unknown flags ignored silently
