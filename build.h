@@ -77,6 +77,7 @@ EXTERN struct {
         void (*mkdir)(string path);
         void (*remove)(string path);
     } fs;
+    void (*fetch_git)(string url);
 } Build;
 
 // implementation
@@ -391,6 +392,18 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
 }
 #endif
 
+void __Build_fetch_git(string url) {
+    if(!Build.fs.exists("./deps/")) {
+        Build.fs.mkdir("./deps/");
+    }
+    printf("fetching %s\n", url);
+    char cmd[BufferSize] = {'\0'};
+    strcat(cmd, "git -C ./deps/ clone --depth=1 --single-branch ");
+    strcat(cmd, url);
+    system(cmd);
+    printf("done\n");
+}
+
 int __Build_Main__(int argc, char **argv);
 #define main(...) \
     main(int argc, char **argv) { \
@@ -403,6 +416,7 @@ int __Build_Main__(int argc, char **argv);
         Build.fs.copy = __BUILD__FS_copy; \
         Build.fs.move = __BUILD__FS_fs_move; \
         Build.fs.remove = __BUILD__FS_remove; \
+        Build.fetch_git = __Build_fetch_git; \
         __Build_Bootstrap__(); \
         return __Build_Main__(argc, argv); \
     }; \

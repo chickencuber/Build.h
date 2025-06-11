@@ -15,6 +15,8 @@ int main() {
 }
 ```
 
+another example can be found in the build.c file
+
 ## Features
 * cross platform build system with windows*(untested), linux, and mac*(untested) support
 * simple api
@@ -23,7 +25,7 @@ int main() {
 ## Planned 
 - [x] MSVC support(untested)
 - [ ] including dependencies from a remote source
-    - [ ] implement remote fetching(requires git)
+    - [x] implement remote fetching(requires git)
     - [ ] add autobuilding(not sure how Ill do this one)
 
 - [x] cross platform fs api
