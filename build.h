@@ -77,7 +77,7 @@ EXTERN struct {
         void (*mkdir)(string path);
         void (*remove)(string path);
     } fs;
-    void (*fetch_git)(string url);
+    void (*fetch_git)(string url, bool build); //build does nothing at the moment
 } Build;
 
 // implementation
@@ -392,7 +392,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
 }
 #endif
 
-void __Build_fetch_git(string url) {
+void __Build_fetch_git(string url, bool build) { //build does nothing at the moment
     if(!Build.fs.exists("./deps/")) {
         Build.fs.mkdir("./deps/");
     }
