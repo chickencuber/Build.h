@@ -33,15 +33,17 @@ typedef enum {
     __FLAG_DEFINE_MACRO,
     __FLAG_COMPILE_ONLY,
     __FLAG_LANGUAGE_STANDARD,
+    __FLAG_RAW,//not cross platform
 } FlagType;
 
 #define FLAG_OPTIMIZE_SPEED     (Flag){ .type = __FLAG_OPTIMIZE_SPEED }
-#define FLAG_OPTIMIZE_SIZE(Flag){ .type = __FLAG_OPTIMIZE_SIZE }
+#define FLAG_OPTIMIZE_SIZE (Flag){ .type = __FLAG_OPTIMIZE_SIZE }
 #define FLAG_DEBUG (Flag){ .type = __FLAG_DEBUG }
-#define FLAG_WARNINGS_LEVEL_3(Flag){ .type = __FLAG_WARNINGS_LEVEL_3 }
-#define FLAG_WARNINGS_LEVEL_4(Flag){ .type = __FLAG_WARNINGS_LEVEL_4 }
+#define FLAG_WARNINGS_LEVEL_3 (Flag){ .type = __FLAG_WARNINGS_LEVEL_3 }
+#define FLAG_WARNINGS_LEVEL_4 (Flag){ .type = __FLAG_WARNINGS_LEVEL_4 }
 #define FLAG_COMPILE_ONLY  (Flag){ .type = __FLAG_COMPILE_ONLY }
 
+#define FLAG_RAW(raw_flag) (Flag){.type=__FLAG_RAW, .str_value=raw_flag}
 #define FLAG_INCLUDE_PATH(path) (Flag){ .type = __FLAG_INCLUDE_PATH, .str_value = path }
 #define FLAG_DEFINE_MACRO(macro) (Flag){ .type = __FLAG_DEFINE_MACRO, .str_value = macro }
 #define FLAG_LANGUAGE_STANDARD(std) (Flag){ .type = __FLAG_LANGUAGE_STANDARD, .str_value = std }
@@ -49,17 +51,14 @@ typedef enum {
 #define MAX_FLAG_STRINGS 4 // one flag can expand to multiple strings
 
 typedef struct {
-    string data[MAX_FLAG_STRINGS];
-    size_t count;
-} FlagStringList;
-
-
-
-
-typedef struct {
     FlagType type;
     string str_value;
 } Flag;
+
+typedef struct {
+    string data[MAX_FLAG_STRINGS];
+    size_t count;
+} FlagStringList;
 
 #define StringArray(...) ((string[]) {__VA_ARGS__})
 #define FlagArray(...) ((Flag[]) {__VA_ARGS__})
