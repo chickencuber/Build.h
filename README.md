@@ -10,20 +10,19 @@ add build.h to your projects directory, define `BUILD_IMPLEMENTATION`, and inclu
 #include "./build.h"
 
 int main() { 
-    string deps[] = {"./main.c"};
-    Build.build("main", deps, 1);
+    Build.build("main", StringArray("main.c"), 1, FlagArray(), 0);
     return 0;
 }
 ```
 
 ## Features
-* cross platform build system with windows*(untested, and no MSVC yet), linux, and mac*(untested) support
+* cross platform build system with windows*(untested), linux, and mac*(untested) support
 * simple api
 * gcc and clang compiler support
 * simple flag support
-## Planed 
-- [ ] MSVC support
+## Planned 
+- [x] MSVC support(untested)
 - [ ] including files from a remote source
 - [x] cross platform fs api
-- [ ] more compilers than just gcc and clang
+- [ ] more compilers than just gcc, clang, and msvc
 

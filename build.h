@@ -23,8 +23,50 @@ typedef const char* string;
 
 #define BufferSize 1024
 
+typedef enum {
+    __FLAG_OPTIMIZE_SPEED,
+    __FLAG_OPTIMIZE_SIZE,
+    __FLAG_DEBUG,
+    __FLAG_WARNINGS_LEVEL_3,
+    __FLAG_WARNINGS_LEVEL_4,
+    __FLAG_INCLUDE_PATH,
+    __FLAG_DEFINE_MACRO,
+    __FLAG_COMPILE_ONLY,
+    __FLAG_LANGUAGE_STANDARD,
+} FlagType;
+
+#define FLAG_OPTIMIZE_SPEED     (Flag){ .type = __FLAG_OPTIMIZE_SPEED }
+#define FLAG_OPTIMIZE_SIZE(Flag){ .type = __FLAG_OPTIMIZE_SIZE }
+#define FLAG_DEBUG (Flag){ .type = __FLAG_DEBUG }
+#define FLAG_WARNINGS_LEVEL_3(Flag){ .type = __FLAG_WARNINGS_LEVEL_3 }
+#define FLAG_WARNINGS_LEVEL_4(Flag){ .type = __FLAG_WARNINGS_LEVEL_4 }
+#define FLAG_COMPILE_ONLY  (Flag){ .type = __FLAG_COMPILE_ONLY }
+
+#define FLAG_INCLUDE_PATH(path) (Flag){ .type = __FLAG_INCLUDE_PATH, .str_value = path }
+#define FLAG_DEFINE_MACRO(macro) (Flag){ .type = __FLAG_DEFINE_MACRO, .str_value = macro }
+#define FLAG_LANGUAGE_STANDARD(std) (Flag){ .type = __FLAG_LANGUAGE_STANDARD, .str_value = std }
+
+#define MAX_FLAG_STRINGS 4 // one flag can expand to multiple strings
+
+typedef struct {
+    string data[MAX_FLAG_STRINGS];
+    size_t count;
+} FlagStringList;
+
+
+
+
+typedef struct {
+    FlagType type;
+    string str_value;
+} Flag;
+
+#define StringArray(...) ((string[]) {__VA_ARGS__})
+#define FlagArray(...) ((Flag[]) {__VA_ARGS__})
+
+
 EXTERN struct {
-    void (*build)(string file, string dep[], size_t dep_length, string flag[], size_t flag_length);
+    void (*build)(string file, string dep[], size_t dep_length, Flag flags[], size_t flag_length);
     bool (*str_ends_with)(string str, string suffix);
     struct {
         bool (*exists)(string path);
@@ -167,7 +209,7 @@ void __Build_Bootstrap__() {
         "build.h",
     };
     if(__Build_needs_rebuild__("./build", deps, 2)) {
-        Build.build("build.new", deps, 2, (string[]) {}, 0); 
+        Build.build("build.new", deps, 2, (Flag[]) {}, 0); 
         __Build_Switch_New__();
     } else {
         printf("not rebuilding build\n");
@@ -175,7 +217,56 @@ void __Build_Bootstrap__() {
 }
 
 #ifdef __GNUC__
-void __Build_Build__(string file, string dep[], size_t dep_length, string flags[], size_t flag_length) {
+FlagStringList flag_to_strings(Flag flag) {
+    FlagStringList result = {0};
+    switch (flag.type) {
+        case __FLAG_OPTIMIZE_SPEED:
+            result.data[0] = "-O2";
+            result.count = 1;
+            break;
+        case __FLAG_OPTIMIZE_SIZE:
+            result.data[0] = "-Os";
+            result.count = 1;
+            break;
+        case __FLAG_DEBUG:
+            result.data[0] = "-g";
+            result.count = 1;
+            break;
+        case __FLAG_WARNINGS_LEVEL_3:
+            result.data[0] = "-Wall";
+            result.count = 1;
+            break;
+        case __FLAG_WARNINGS_LEVEL_4:
+            result.data[0] = "-Wall";
+            result.data[1] = "-Wextra";
+            result.count = 2;
+            break;
+        case __FLAG_INCLUDE_PATH:
+            result.data[0] = "-I";
+            result.data[1] = flag.str_value;
+            result.count = 2;
+            break;
+        case __FLAG_DEFINE_MACRO:
+            result.data[0] = "-D";
+            result.data[1] = flag.str_value;
+            result.count = 2;
+            break;
+        case __FLAG_COMPILE_ONLY:
+            result.data[0] = "-c";
+            result.count = 1;
+            break;
+        case __FLAG_LANGUAGE_STANDARD:
+            result.data[0] = "-std";
+            result.data[1] = flag.str_value; // e.g., "c99", "gnu11"
+            result.count = 2;
+            break;
+        default:
+            // ignore unknown flags silently
+            break;
+    }
+    return result;
+}
+void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[], size_t flag_length) {
     if(!__Build_needs_rebuild__(file, dep, dep_length)) {
         printf("not rebuilding %s\n", file);
         return;
@@ -187,9 +278,11 @@ void __Build_Build__(string file, string dep[], size_t dep_length, string flags[
     strcat(cmd, "gcc ");
 #endif
     for(size_t i = 0; i < flag_length; i++) {
-        strcat(cmd, "-");
-        strcat(cmd, flags[i]);
-        strcat(cmd, " ");
+        FlagStringList f = flag_to_strings(flags[i]);
+        for(size_t ii = 0; ii < f.count; ii++) {
+            strcat(cmd, f.data[ii]);
+            strcat(cmd, " ");
+        }
     }
     for(size_t i = 0; i < dep_length; i++) {
         if(Build.str_ends_with(dep[i], ".h") || Build.str_ends_with(dep[i], ".hpp")){ //ignore anything that isnt a .c
@@ -204,8 +297,95 @@ void __Build_Build__(string file, string dep[], size_t dep_length, string flags[
     system(cmd);
     printf("done\n");
 }
-#else 
-void __Build_Build__(string file, string dep[], size_t dep_length, string flags[], size_t flag_length) {
+#elif defined(_MSC_VER)
+
+FlagStringList flag_to_strings_msvc(Flag flag) {
+    FlagStringList result = {0};
+    switch (flag.type) {
+        case __FLAG_OPTIMIZE_SPEED:
+            result.data[0] = "/O2";    // optimize for speed
+            result.count = 1;
+            break;
+        case __FLAG_OPTIMIZE_SIZE:
+            result.data[0] = "/O1";    // optimize for size
+            result.count = 1;
+            break;
+        case __FLAG_DEBUG:
+            result.data[0] = "/Zi";    // generate debug info
+            result.count = 1;
+            break;
+        case __FLAG_WARNINGS_LEVEL_3:
+            result.data[0] = "/W3";    // warning level 3
+            result.count = 1;
+            break;
+        case __FLAG_WARNINGS_LEVEL_4:
+            result.data[0] = "/W4";    // warning level 4 (more verbose)
+            result.count = 1;
+            break;
+        case __FLAG_INCLUDE_PATH:
+            result.data[0] = "/I";
+            result.data[1] = flag.str_value;  // path right after /I
+            result.count = 2;
+            break;
+        case __FLAG_DEFINE_MACRO:
+            result.data[0] = "/D";
+            result.data[1] = flag.str_value;
+            result.count = 2;
+            break;
+        case __FLAG_COMPILE_ONLY:
+            result.data[0] = "/c";     // compile only, don’t link
+            result.count = 1;
+            break;
+        case __FLAG_LANGUAGE_STANDARD:
+            // MSVC doesn't support setting C standard like gcc/clang;
+            // typically defaults to latest supported or use /std:c11 (VS2019+)
+            // so we can do a simple check or ignore for older
+            if (strcmp(flag.str_value, "c11") == 0) {
+                result.data[0] = "/std:c11";
+                result.count = 1;
+            } else if (strcmp(flag.str_value, "c17") == 0) {
+                result.data[0] = "/std:c17";
+                result.count = 1;
+            } else {
+                // default or ignore for unsupported standards
+                result.count = 0;
+            }
+            break;
+        default:
+            // unknown flags ignored silently
+            break;
+    }
+    return result;
+}
+void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[], size_t flag_length) {
+    if(!__Build_needs_rebuild__(file, dep, dep_length)) {
+        printf("not rebuilding %s\n", file);
+        return;
+    }
+    char cmd[BufferSize] = {'\0'};
+    strcat(cmd, "cl ");
+    for(size_t i = 0; i < flag_length; i++) {
+        FlagStringList f = flag_to_strings(flags[i]);
+        for(size_t ii = 0; ii < f.count; ii++) {
+            strcat(cmd, f.data[ii]);
+        }
+        strcat(cmd, " ");
+    }
+    for(size_t i = 0; i < dep_length; i++) {
+        if(Build.str_ends_with(dep[i], ".h") || Build.str_ends_with(dep[i], ".hpp")){ //ignore anything that isnt a .c
+            continue;
+        }
+        strcat(cmd, dep[i]);
+        strcat(cmd, " ");
+    }
+    strcat(cmd, "/Fe");
+    strcat(cmd, file);
+    printf("running cmd %s\n", cmd);
+    system(cmd);
+    printf("done\n");
+}
+#else
+void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[], size_t flag_length) {
     fprintf(stderr, "\033[31munknown compiler\033[0m\n");
     exit(1);
 }

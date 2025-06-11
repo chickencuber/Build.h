@@ -5,16 +5,8 @@ int main() {
     if(!Build.fs.exists("./target/")) {
         Build.fs.mkdir("./target/");
     }
-    Build.build("./target/main.o", (string[]){"./main.c"}, 1, (string[]) {"c"}, 1);
-    Build.build("./target/other.o", (string[]){"./other.c"}, 1, (string[]) {"c"}, 1);
-    Build.build(
-            "./main", 
-            (string[]) {
-            "./target/main.o",
-            "./target/other.o",
-            }, 
-            2, 
-            (string[]){}, 0
-            );
+    Build.build("target/main.o", StringArray("main.c"), 1, FlagArray(FLAG_COMPILE_ONLY), 1);
+    Build.build("target/other.o", StringArray("other.c"), 1, FlagArray(FLAG_COMPILE_ONLY), 1);
+    Build.build("main", StringArray("target/main.o", "target/other.o"), 2, FlagArray(), 0);
     return 0;
 }
