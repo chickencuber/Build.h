@@ -22,7 +22,10 @@ int main() {
 * simple flag support
 ## Planned 
 - [x] MSVC support(untested)
-- [ ] including files from a remote source
+- [ ] including dependencies from a remote source
+    - [ ] implement remote fetching(requires git)
+    - [ ] add autobuilding(not sure how Ill do this one)
+
 - [x] cross platform fs api
 - [ ] more compilers than just gcc, clang, and msvc
 
