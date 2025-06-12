@@ -31,5 +31,8 @@ another example can be found in the build.c file
 - [x] cross platform fs api
 - [ ] more compilers than just gcc, clang, and msvc
 ## Known bug
-windows is completly broken, if you would like to help fix it, feel free to make a PR
-
+windows is completly broken, if you would like to help fix it, feel free to make a PR  
+if you're on windows, there are three things you can do
+1. make a PR with a fix
+2. use WSL
+3. switch to linux
