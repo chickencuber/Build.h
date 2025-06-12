@@ -303,7 +303,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
 }
 #elif defined(_MSC_VER)
 
-FlagStringList flag_to_strings_msvc(Flag flag) {
+FlagStringList flag_to_strings(Flag flag) {
     FlagStringList result = {0};
     switch (flag.type) {
         case __FLAG_OPTIMIZE_SPEED:

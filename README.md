@@ -30,4 +30,6 @@ another example can be found in the build.c file
 
 - [x] cross platform fs api
 - [ ] more compilers than just gcc, clang, and msvc
+## Known bug
+windows is completly broken, if you would like to help fix it, feel free to make a PR
 
