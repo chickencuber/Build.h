@@ -14,10 +14,17 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <process.h>
+#define _OBJ ".obj"
+#define _EXE ".exe"
 #else
 #include <unistd.h>
 #include <sys/stat.h>
+#define _OBJ ".o"
+#define _EXE ""
 #endif
+#define EXECUTABLE(name) name _EXE
+#define OBJECT(name) name _OBJ
+
 
 typedef const char* string;
 
@@ -84,7 +91,7 @@ EXTERN struct {
 
 #ifdef _WIN32
 void __Build_Switch_New__() {
-    system("start \"\" /B cmd /C \"timeout /t 1 >nul && move /Y build.new build.exe && build.exe\"");
+    system("start \"\" /B cmd /C \"timeout /t 1 >nul && move /Y build.new.exe build.exe && build.exe\"");
     exit(0);
 }
 bool __Build_needs_rebuild__(string output, string sources[], size_t n) {
@@ -103,7 +110,7 @@ bool __Build_needs_rebuild__(string output, string sources[], size_t n) {
         GetFileTime(srcFile, NULL, NULL, &srcTime);
         CloseHandle(srcFile);
 
-        if (CompareFileTime(&srcTime, &outTime) > 0) return true; // src newer than out
+        if (CompareFileTime(&srcTime, &outTime) === 0) return true; // src newer than out
     }
 
     return false;
@@ -208,8 +215,8 @@ void __Build_Bootstrap__() {
         "build.c",
         "build.h",
     };
-    if(__Build_needs_rebuild__("./build", deps, 2)) {
-        Build.build("build.new", deps, 2, (Flag[]) {}, 0); 
+    if(__Build_needs_rebuild__(EXEXECUTABLE("./build"), deps, 2)) {
+        Build.build(EXEXECUTABLE("build.new"), deps, 2, (Flag[]) {}, 0); 
         __Build_Switch_New__();
     } else {
         printf("not rebuilding build\n");
