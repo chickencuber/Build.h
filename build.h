@@ -215,8 +215,8 @@ void __Build_Bootstrap__() {
         "build.c",
         "build.h",
     };
-    if(__Build_needs_rebuild__(EXEXECUTABLE("./build"), deps, 2)) {
-        Build.build(EXEXECUTABLE("build.new"), deps, 2, (Flag[]) {}, 0); 
+    if(__Build_needs_rebuild__(EXECUTABLE("./build"), deps, 2)) {
+        Build.build(EXECUTABLE("build.new"), deps, 2, (Flag[]) {}, 0); 
         __Build_Switch_New__();
     } else {
         printf("not rebuilding build\n");
