@@ -58,8 +58,8 @@
 #define _PATH_SELECT(N, ...) _PATH_DISPATCH(N, __VA_ARGS__)
 #define PATH(...) _PATH_SELECT(_NARG(__VA_ARGS__), __VA_ARGS__)
 
-#define EXECUTABLE(name, ...) PATH(name, __VA_ARGS__) _EXE
-#define OBJECT(name, ...) PATH(name, __VA_ARGS__) _OBJ
+#define EXECUTABLE(...) PATH(__VA_ARGS__) _EXE
+#define OBJECT(...) PATH(__VA_ARGS__) _OBJ
 
 typedef const char* string;
 
@@ -250,7 +250,7 @@ void __Build_Bootstrap__() {
         "build.c",
         "build.h",
     };
-    if(__Build_needs_rebuild__(EXECUTABLE("./build"), deps, 2)) {
+    if(__Build_needs_rebuild__(EXECUTABLE(".","build"), deps, 2)) {
         Build.build(EXECUTABLE("build.new"), deps, 2, (Flag[]) {}, 0); 
         __Build_Switch_New__();
     } else {
