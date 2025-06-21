@@ -16,15 +16,50 @@
 #include <process.h>
 #define _OBJ ".obj"
 #define _EXE ".exe"
+#define _PATH_SEP "\\"
+#define ROOT "C:\\"
 #else
 #include <unistd.h>
 #include <sys/stat.h>
 #define _OBJ ".o"
 #define _EXE ""
+#define _PATH_SEP "/"
+#define ROOT "/"
 #endif
-#define EXECUTABLE(name) name _EXE
-#define OBJECT(name) name _OBJ
 
+#define _NARG(...) _NARG_(__VA_ARGS__, _RSEQ_N())
+#define _NARG_(...) _ARG_N(__VA_ARGS__)
+#define _ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,N,...) N
+#define _RSEQ_N() 20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0
+
+#define _PATH_0() ""
+#define _PATH_1(_1) _1
+#define _PATH_2(_1, _2) _1 _PATH_SEP _2
+#define _PATH_3(_1, _2, _3) _1 _PATH_SEP _2 _PATH_SEP _3
+#define _PATH_4(_1, _2, _3, _4) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4
+#define _PATH_5(_1, _2, _3, _4, _5) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5
+#define _PATH_6(_1, _2, _3, _4, _5, _6) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6
+#define _PATH_7(_1, _2, _3, _4, _5, _6, _7) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7
+#define _PATH_8(_1, _2, _3, _4, _5, _6, _7, _8) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8
+#define _PATH_9(_1, _2, _3, _4, _5, _6, _7, _8, _9) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9
+#define _PATH_10(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10
+#define _PATH_11(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11
+#define _PATH_12(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12
+#define _PATH_13(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13
+#define _PATH_14(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13 _PATH_SEP _14
+#define _PATH_15(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13 _PATH_SEP _14 _PATH_SEP _15
+#define _PATH_16(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13 _PATH_SEP _14 _PATH_SEP _15 _PATH_SEP _16
+#define _PATH_17(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13 _PATH_SEP _14 _PATH_SEP _15 _PATH_SEP _16 _PATH_SEP _17
+#define _PATH_18(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13 _PATH_SEP _14 _PATH_SEP _15 _PATH_SEP _16 _PATH_SEP _17 _PATH_SEP _18
+#define _PATH_19(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13 _PATH_SEP _14 _PATH_SEP _15 _PATH_SEP _16 _PATH_SEP _17 _PATH_SEP _18 _PATH_SEP _19
+#define _PATH_20(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10 _PATH_SEP _11 _PATH_SEP _12 _PATH_SEP _13 _PATH_SEP _14 _PATH_SEP _15 _PATH_SEP _16 _PATH_SEP _17 _PATH_SEP _18 _PATH_SEP _19 _PATH_SEP _20
+
+#define _PATH_DISPATCH(N, ...) _PATH_##N(__VA_ARGS__)
+#define _PATH_SELECT(N, ...) _PATH_DISPATCH(N, __VA_ARGS__)
+#define PATH(...) _PATH_SELECT(_NARG(__VA_ARGS__), __VA_ARGS__)
+
+#define EXECUTABLE(name, ...) PATH(name, __VA_ARGS__) _EXE
+#define OBJECT(name, ...) PATH(name, __VA_ARGS__) _OBJ
 
 typedef const char* string;
 
