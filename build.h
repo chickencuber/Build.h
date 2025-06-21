@@ -110,7 +110,7 @@ bool __Build_needs_rebuild__(string output, string sources[], size_t n) {
         GetFileTime(srcFile, NULL, NULL, &srcTime);
         CloseHandle(srcFile);
 
-        if (CompareFileTime(&srcTime, &outTime) === 0) return true; // src newer than out
+        if (CompareFileTime(&srcTime, &outTime) == 0) return true; // src newer than out
     }
 
     return false;
