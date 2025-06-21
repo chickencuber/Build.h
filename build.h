@@ -58,8 +58,8 @@
 #define _PATH_SELECT(N, ...) _PATH_DISPATCH(N, __VA_ARGS__)
 #define PATH(...) _PATH_SELECT(_NARG(__VA_ARGS__), __VA_ARGS__)
 
-#define EXECUTABLE(...) (PATH(__VA_ARGS__) _EXE "")
-#define OBJECT(...)     (PATH(__VA_ARGS__) _OBJ "")
+#define EXECUTABLE(...) PATH(__VA_ARGS__) _EXE ""
+#define OBJECT(...)     PATH(__VA_ARGS__) _OBJ ""
 
 typedef const char* string;
 
