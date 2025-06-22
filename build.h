@@ -4,7 +4,6 @@
 #else
 #define EXTERN extern
 #endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -313,7 +312,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
 }
 #elif defined(_MSC_VER)
 
-FlagStringList flag_to_strings(Flag flag) {
+FlagStringList flag_to_strings(Flag flag, bool* comp_only) {
     FlagStringList result = {0};
     switch (flag.type) {
         case __FLAG_OPTIMIZE_SPEED:
@@ -348,6 +347,7 @@ FlagStringList flag_to_strings(Flag flag) {
             break;
         case __FLAG_COMPILE_ONLY:
             result.data[0] = "/c";     // compile only, don’t link
+            *comp_only = true;
             result.count = 1;
             break;
         case __FLAG_LANGUAGE_STANDARD:
@@ -380,10 +380,11 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
         printf("not rebuilding %s\n", file);
         return;
     }
+    bool comp_only = false;
     char cmd[BufferSize] = {'\0'};
     strcat(cmd, "cl ");
     for(size_t i = 0; i < flag_length; i++) {
-        FlagStringList f = flag_to_strings(flags[i]);
+        FlagStringList f = flag_to_strings(flags[i], &comp_only);
         for(size_t ii = 0; ii < f.count; ii++) {
             strcat(cmd, f.data[ii]);
         }
@@ -396,7 +397,11 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
         strcat(cmd, dep[i]);
         strcat(cmd, " ");
     }
-    strcat(cmd, "/Fe");
+    if(comp_only) {
+        strcat(cmd, "/Fc");
+    } else {
+        strcat(cmd, "/Fe");
+    }
     strcat(cmd, file);
     printf("running cmd %s\n", cmd);
     system(cmd);
