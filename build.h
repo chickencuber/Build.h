@@ -16,19 +16,18 @@
 #include <process.h>
 #define _OBJ ".obj"
 #define _EXE ".exe"
-#define PATH_SEP "\\"
-#define ROOT "C:\\"
+#define ROOT "C:/"
 #else
 #include <unistd.h>
 #include <sys/stat.h>
 #define _OBJ ".o"
 #define _EXE ""
-#define PATH_SEP "/"
 #define ROOT "/"
 #endif
 
-#define EXECUTABLE(name) name _EXE ""
-#define OBJECT(name) name _OBJ ""
+
+#define EXECUTABLE(name) name _EXE
+#define OBJECT(name) name _OBJ
 
 typedef const char* string;
 
@@ -219,7 +218,7 @@ void __Build_Bootstrap__() {
         "build.c",
         "build.h",
     };
-    if(__Build_needs_rebuild__(EXECUTABLE("."PATH_SEP"build"), deps, 2)) {
+    if(__Build_needs_rebuild__(EXECUTABLE("./build"), deps, 2)) {
         Build.build(EXECUTABLE("build.new"), deps, 2, (Flag[]) {}, 0); 
         __Build_Switch_New__();
     } else {
@@ -385,7 +384,9 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
     strcat(cmd, "cl ");
     for(size_t i = 0; i < flag_length; i++) {
         FlagStringList f = flag_to_strings(flags[i]);
-        for(size_t ii = 0; ii < f.count; ii++) {
+        strcat(cmd, f.data[0]);
+        for(size_t ii = 1; ii < f.count; ii++) {
+            strcat(cmd, ":");
             strcat(cmd, f.data[ii]);
         }
         strcat(cmd, " ");
@@ -397,7 +398,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
         strcat(cmd, dep[i]);
         strcat(cmd, " ");
     }
-    strcat(cmd, "/Fe");
+    strcat(cmd, "/Fe:");
     strcat(cmd, file);
     printf("running cmd %s\n", cmd);
     system(cmd);
