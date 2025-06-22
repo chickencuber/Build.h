@@ -398,7 +398,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
         strcat(cmd, " ");
     }
     if(comp_only) {
-        strcat(cmd, "/Fc");
+        strcat(cmd, "/FAsc");
     } else {
         strcat(cmd, "/Fe");
     }
