@@ -384,9 +384,7 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
     strcat(cmd, "cl ");
     for(size_t i = 0; i < flag_length; i++) {
         FlagStringList f = flag_to_strings(flags[i]);
-        strcat(cmd, f.data[0]);
-        for(size_t ii = 1; ii < f.count; ii++) {
-            strcat(cmd, ":");
+        for(size_t ii = 0; ii < f.count; ii++) {
             strcat(cmd, f.data[ii]);
         }
         strcat(cmd, " ");
@@ -398,8 +396,9 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
         strcat(cmd, dep[i]);
         strcat(cmd, " ");
     }
-    strcat(cmd, "/Fe:");
+    strcat(cmd, "/Fe:\"");
     strcat(cmd, file);
+    strcat(cmd, "\"");
     printf("running cmd %s\n", cmd);
     system(cmd);
     printf("done\n");
