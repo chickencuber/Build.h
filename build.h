@@ -39,6 +39,9 @@
 #define EXPAND(x) x
 #define EVAL(...) EXPAND(EXPAND(EXPAND(__VA_ARGS__)))
 
+#define _PATH_DISPATCH(N, ...) _PATH_##N(__VA_ARGS__)
+#define _PATH_SELECT(N, ...) EVAL(_PATH_DISPATCH(N, __VA_ARGS__))
+#define PATH(...) _PATH_SELECT(_NARG(__VA_ARGS__), __VA_ARGS__)
 
 // Path component macros
 #define _PATH_0() ""
@@ -52,9 +55,6 @@
 #define _PATH_8(_1, _2, _3, _4, _5, _6, _7, _8) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8
 #define _PATH_9(_1, _2, _3, _4, _5, _6, _7, _8, _9) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9
 #define _PATH_10(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10
-#define _PATH_DISPATCH(N, ...) _PATH_##N(__VA_ARGS__)
-#define _PATH_SELECT(N, ...) _PATH_DISPATCH(N, __VA_ARGS__)
-#define PATH(...) _PATH_SELECT(_NARG(__VA_ARGS__), __VA_ARGS__)
 
 #define EXECUTABLE(...) PATH(__VA_ARGS__) _EXE ""
 #define OBJECT(...)     PATH(__VA_ARGS__) _OBJ ""
