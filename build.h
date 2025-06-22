@@ -215,11 +215,11 @@ bool __Build_Ends_With__(string str, string suffix) {
 
 void __Build_Bootstrap__() { 
     string deps[] = {
-        "build.c",
-        "build.h",
+        "./build.c",
+        "./build.h",
     };
     if(__Build_needs_rebuild__(EXECUTABLE("./build"), deps, 2)) {
-        Build.build(EXECUTABLE("build.new"), deps, 2, (Flag[]) {}, 0); 
+        Build.build(EXECUTABLE("./build.new"), deps, 2, (Flag[]) {}, 0); 
         __Build_Switch_New__();
     } else {
         printf("not rebuilding build\n");
@@ -396,9 +396,8 @@ void __Build_Build__(string file, string dep[], size_t dep_length, Flag flags[],
         strcat(cmd, dep[i]);
         strcat(cmd, " ");
     }
-    strcat(cmd, "/Fe:\"");
+    strcat(cmd, "/Fe");
     strcat(cmd, file);
-    strcat(cmd, "\"");
     printf("running cmd %s\n", cmd);
     system(cmd);
     printf("done\n");
