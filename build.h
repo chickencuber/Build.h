@@ -16,48 +16,19 @@
 #include <process.h>
 #define _OBJ ".obj"
 #define _EXE ".exe"
-#define _PATH_SEP "\\"
+#define PATH_SEP "\\"
 #define ROOT "C:\\"
 #else
 #include <unistd.h>
 #include <sys/stat.h>
 #define _OBJ ".o"
 #define _EXE ""
-#define _PATH_SEP "/"
+#define PATH_SEP "/"
 #define ROOT "/"
 #endif
 
-#define _NARG(...) _NARG_IMPL_(__VA_ARGS__, _RSEQ_N())
-#define _NARG_IMPL_(...) _ARG_N(__VA_ARGS__)
-#define _ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10, \
-               _11,_12,_13,_14,_15,_16,_17,_18,_19,_20,N,...) N
-#define _RSEQ_N() \
-     20,19,18,17,16,15,14,13,12,11,10, \
-     9,8,7,6,5,4,3,2,1,0
-
-// MSVC workaround: force macro expansion in stages
-#define EXPAND(x) x
-#define EVAL(...) EXPAND(EXPAND(EXPAND(__VA_ARGS__)))
-
-#define _PATH_DISPATCH(N, ...) _PATH_##N(__VA_ARGS__)
-#define _PATH_SELECT(N, ...) EVAL(_PATH_DISPATCH(N, __VA_ARGS__))
-#define PATH(...) _PATH_SELECT(_NARG(__VA_ARGS__), __VA_ARGS__)
-
-// Path component macros
-#define _PATH_0() ""
-#define _PATH_1(_1) _1
-#define _PATH_2(_1, _2) _1 _PATH_SEP _2
-#define _PATH_3(_1, _2, _3) _1 _PATH_SEP _2 _PATH_SEP _3
-#define _PATH_4(_1, _2, _3, _4) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4
-#define _PATH_5(_1, _2, _3, _4, _5) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5
-#define _PATH_6(_1, _2, _3, _4, _5, _6) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6
-#define _PATH_7(_1, _2, _3, _4, _5, _6, _7) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7
-#define _PATH_8(_1, _2, _3, _4, _5, _6, _7, _8) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8
-#define _PATH_9(_1, _2, _3, _4, _5, _6, _7, _8, _9) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9
-#define _PATH_10(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10) _1 _PATH_SEP _2 _PATH_SEP _3 _PATH_SEP _4 _PATH_SEP _5 _PATH_SEP _6 _PATH_SEP _7 _PATH_SEP _8 _PATH_SEP _9 _PATH_SEP _10
-
-#define EXECUTABLE(...) PATH(__VA_ARGS__) _EXE ""
-#define OBJECT(...)     PATH(__VA_ARGS__) _OBJ ""
+#define EXECUTABLE(name) name _EXE ""
+#define OBJECT(name) name _OBJ ""
 
 typedef const char* string;
 
@@ -248,7 +219,7 @@ void __Build_Bootstrap__() {
         "build.c",
         "build.h",
     };
-    if(__Build_needs_rebuild__(EXECUTABLE(".","build"), deps, 2)) {
+    if(__Build_needs_rebuild__(EXECUTABLE("."PATH_SEP"build"), deps, 2)) {
         Build.build(EXECUTABLE("build.new"), deps, 2, (Flag[]) {}, 0); 
         __Build_Switch_New__();
     } else {
