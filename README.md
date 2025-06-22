@@ -18,21 +18,16 @@ int main() {
 another example can be found in the build.c file
 
 ## Features
-* cross platform build system with windows*(untested), linux, and mac*(untested) support
+* cross platform build system with windows(now tested), linux, and mac*(untested) support
 * simple api
 * gcc and clang compiler support
 * simple flag support
 ## Planned 
-- [x] MSVC support(untested)
+- [x] MSVC support
 - [ ] including dependencies from a remote source
     - [x] implement remote fetching(requires git)
     - [ ] add autobuilding(not sure how Ill do this one)
 
 - [x] cross platform fs api
 - [ ] more compilers than just gcc, clang, and msvc
-## Known bug
-windows is completly broken, if you would like to help fix it, feel free to make a PR  
-if you're on windows, there are three things you can do
-1. make a PR with a fix
-2. use WSL
-3. switch to linux
+
